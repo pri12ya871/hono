@@ -7,6 +7,7 @@ import DefaultExport, {
   jsx,
   memo,
   useContext,
+  useRef,
   version,
 } from '.'
 import type { Context, FC, PropsWithChildren } from '.'
@@ -486,6 +487,27 @@ describe('render to string', () => {
       const onClick = () => {}
       const template = <button data-handler={onClick}>Click</button>
       expect(() => template.toString()).toThrow(Error)
+    })
+  })
+
+  // https://github.com/honojs/hono/issues/5560
+  describe('Ref object', () => {
+    it('should be ignored when created with useRef()', () => {
+      const App = () => {
+        const ref = useRef(null)
+        return (
+          <a ref={ref} href='/'>
+            x
+          </a>
+        )
+      }
+      const template = <App />
+      expect(template.toString()).toBe('<a href="/">x</a>')
+    })
+
+    it('should be ignored when it is a plain object', () => {
+      const template = <div ref={{ current: null }}>Content</div>
+      expect(template.toString()).toBe('<div>Content</div>')
     })
   })
 
